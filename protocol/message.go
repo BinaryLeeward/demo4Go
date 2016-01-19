@@ -37,15 +37,20 @@ type User struct {
 
 func init() {
 	//register
-	messageTypeMap[1] = reflect.TypeOf(Chat{})
-	messageTypeMap[2] = reflect.TypeOf(User{})
+	messageTypeMap[1] = reflect.TypeOf(new(Chat))
+	messageTypeMap[2] = reflect.TypeOf(new(User))
 }
 
 func ParseMessage(reader io.Reader) interface{} {
 	v := parseMessageType(reader)
+	// log.Printf("%v %T\n", v1, v1)
+	// v = new(User)
+	// var v *User
+	log.Printf("%v %T\n", v, v)
 	data := parseMessageData(reader)
 	err := json.Unmarshal(data, &v)
 	util.CheckError(err)
+	log.Println(v)
 	return v
 }
 
@@ -56,9 +61,10 @@ func parseMessageType(reader io.Reader) interface{} {
 	messageType := uint8(headByte[0])
 	for key, value := range messageTypeMap {
 		if messageType == key {
-			log.Println(reflect.TypeOf(value))
-			return reflect.Zero(value)
-			// return new(value.Type())
+			log.Println(value)
+			v := reflect.New(value).Elem().Interface()
+			return v
+			// return new(reflect.TypeOf(value))
 		}
 	}
 	panic("undefined msg type")
