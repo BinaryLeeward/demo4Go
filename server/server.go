@@ -25,8 +25,8 @@ func handleConn(conn net.Conn) {
 	v := protocol.ParseMessage(conn)
 	log.Println(reflect.TypeOf(v))
 	switch v.(type) {
-	case protocol.User:
-		x := v.(protocol.User)
+	case *protocol.User:
+		x := v.(*protocol.User)
 		log.Println(x.Name)
 	}
 }
